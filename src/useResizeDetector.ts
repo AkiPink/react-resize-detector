@@ -4,6 +4,8 @@ import { patchResizeHandler, createNotifier, isSSR } from './utils';
 
 import { Props, ReactResizeDetectorDimensions } from './ResizeDetector';
 
+import ResizeObserver from 'resize-observer-polyfill'
+
 const useEnhancedEffect = isSSR() ? useEffect : useLayoutEffect;
 
 interface FunctionProps extends Props {
@@ -56,7 +58,11 @@ function useResizeDetector<T = any>(props: FunctionProps = {}): UseResizeDetecto
     };
 
     resizeHandler.current = patchResizeHandler(resizeCallback, refreshMode, refreshRate, refreshOptions);
-
+  
+    if (!window.ResizeObserver) {
+      window.ResizeObserver = ResizeObserver
+    }
+    
     const resizeObserver = new window.ResizeObserver(resizeHandler.current as ResizeObserverCallback);
 
     if (ref.current) {
